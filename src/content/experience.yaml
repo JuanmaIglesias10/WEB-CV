@@ -1,0 +1,40 @@
+# Experiencia laboral. `focus` en cada highlight define en qué enfoques aparece primero (todos se muestran siempre).
+# `skills`: ids de src/content/skills.yaml (se usan en la topología y como etiquetas).
+
+- id: celsur
+  order: 0
+  company: Celsur Logística
+  role: { es: Infraestructura de Red, en: Network Infrastructure }
+  start: '2025-12'
+  end: null
+  highlights:
+    - focus: [general, redes, devops]
+      es: 'Monitoreo y observabilidad de la infraestructura productiva con WhatsUp Gold: configuración de monitores y alertas, detección y resolución proactiva de incidentes.'
+      en: 'Monitoring and observability of production infrastructure with WhatsUp Gold: monitor and alert configuration, proactive incident detection and resolution.'
+    - focus: [general, devops, redes]
+      es: Desarrollo de dashboards en Grafana conectados a la base SQL Server de WhatsUp Gold y reportes automatizados en Power BI para dar visibilidad del estado de la red al equipo.
+      en: Built Grafana dashboards connected to the WhatsUp Gold SQL Server database and automated Power BI reports to give the team visibility into network health.
+    - focus: [general, seguridad, devops]
+      es: Automatización de procesos operativos y scripting con Python y PowerShell, reduciendo tareas manuales repetitivas.
+      en: Automated operational processes with Python and PowerShell scripting, reducing repetitive manual work.
+    - focus: [general, redes]
+      es: Relevamiento de necesidades de áreas operativas y su traducción en soluciones y especificaciones técnicas (pliegos, planos de cobertura, reportes).
+      en: Gathered requirements from operational areas and translated them into technical solutions and specifications (tender documents, coverage maps, reports).
+    - focus: [general, redes, seguridad]
+      es: Administración de redes LAN/WAN y SD-WAN (Fortinet) en entorno productivo; configuración de routers, switches y access points Cisco.
+      en: Administered LAN/WAN and SD-WAN (Fortinet) networks in production; configured Cisco routers, switches and access points.
+  skills:
+    [
+      whatsup-gold,
+      grafana,
+      power-bi,
+      sql,
+      alertas,
+      python,
+      powershell,
+      scripting,
+      cisco,
+      lan-wan,
+      sdwan,
+      fortinet,
+    ]

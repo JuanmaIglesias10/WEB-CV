@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { profile } from '../data/profile';
+---
+
+<BaseLayout locale="es" title={`404 — ${profile.name}`} alternates={{ es: '/', en: '/en/' }} noindex>
+  <div class="relative isolate">
+    <div class="noc-grid absolute inset-0 -z-10" aria-hidden="true"></div>
+    <div class="mx-auto max-w-3xl px-4 py-20 sm:px-6 sm:py-28">
+      <p class="label-mono text-crit">● 404 · Host unreachable</p>
+      <h1 class="mt-4 text-4xl font-extrabold tracking-tight sm:text-6xl">Host inalcanzable</h1>
+      <div class="panel mt-8 overflow-x-auto p-5 font-mono text-sm leading-relaxed">
+        <p>
+          <span class="text-accent">jmi@noc:~$</span> ping <span data-path>/ruta</span>
+        </p>
+        <p class="text-muted">PING (404): 56 data bytes</p>
+        <p class="text-crit">Request timeout for icmp_seq 0</p>
+        <p class="text-crit">Destination Host Unreachable</p>
+        <p class="mt-2 text-muted">--- ping statistics ---</p>
+        <p class="text-muted">1 packets transmitted, 0 packets received, 100.0% packet loss</p>
+      </div>
+      <p class="mt-8 text-lg text-muted">
+        La página que buscás no existe o se movió.{' '}
+        <span lang="en">The page you're looking for doesn't exist.</span>
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="/" class="btn btn-primary">
+          Volver al inicio
+        </a>
+        <a href="/en/" class="btn btn-ghost" lang="en" hreflang="en">
+          Go to English home
+        </a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const el = document.querySelector('[data-path]');
+    if (el) el.textContent = window.location.pathname;
+  });
+</script>

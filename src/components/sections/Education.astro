@@ -1,0 +1,71 @@
+---
+import Section from '../ui/Section.astro';
+import Icon from '../ui/Icon.astro';
+import type { Cv } from '../../lib/cv';
+import { useTranslations } from '../../i18n/ui';
+import { sectionIds } from '../../i18n/routes';
+
+interface Props {
+  cv: Cv;
+}
+
+const { cv } = Astro.props;
+const t = useTranslations(cv.locale);
+---
+
+<Section id={sectionIds.education} index="05" command="show education" title={t('education.title')}>
+  <div class="grid gap-5 lg:grid-cols-3">
+    {cv.education.map((edu) => (
+      <article class="panel flex flex-col p-5 sm:p-6 lg:col-span-1">
+        <p class="label-mono">{edu.institution}</p>
+        <h3 class="mt-3 text-lg font-bold tracking-tight">{edu.title}</h3>
+        <p class="mt-1 font-mono text-sm text-subtle">
+          {edu.start}
+          {edu.end === null
+            ? ` – ${t('experience.present')}`
+            : edu.end !== edu.start
+              ? ` – ${edu.end}`
+              : ''}{' '}
+          · {edu.detail}
+        </p>
+        {edu.progress && (
+          <div class="mt-5">
+            <div class="flex gap-1" aria-hidden="true">
+              {Array.from({ length: edu.progress.total }, (_, i) => (
+                <span
+                  class:list={[
+                    'h-2 flex-1 rounded-sm',
+                    i < edu.progress!.current - 1 && 'bg-accent',
+                    i === edu.progress!.current - 1 && 'animate-pulse bg-accent/60',
+                    i >= edu.progress!.current && 'bg-sunken',
+                  ]}
+                />
+              ))}
+            </div>
+            <p class="mt-2 font-mono text-xs text-subtle">
+              {t('education.year', { n: edu.progress.current, total: edu.progress.total })} ·{' '}
+              {t('education.inProgress')}
+            </p>
+          </div>
+        )}
+        {edu.credential && (
+          <a href={edu.credential} class="link mt-5 inline-flex items-center gap-1.5 text-sm">
+            {t('education.credential')}
+            <Icon name="external" class="size-3.5" />
+          </a>
+        )}
+      </article>
+    ))}
+    <article class="panel p-5 sm:p-6">
+      <p class="label-mono">{t('education.languages')}</p>
+      <ul class="mt-4 space-y-3">
+        {cv.languages.map((lang) => (
+          <li class="flex items-baseline justify-between gap-4 border-b border-line pb-3 last:border-0 last:pb-0">
+            <span class="font-semibold">{lang.name}</span>
+            <span class="text-right font-mono text-sm text-muted">{lang.level}</span>
+          </li>
+        ))}
+      </ul>
+    </article>
+  </div>
+</Section>

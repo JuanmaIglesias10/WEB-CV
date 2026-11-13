@@ -1,0 +1,105 @@
+# Enfoques del CV. Cada uno genera una página (/, /redes/, /seguridad/, /devops/ y sus versiones /en/...)
+# y un PDF por idioma. Para agregar un enfoque: sumar una entrada acá (con slug único por idioma).
+# categoryOrder: ids de src/content/skills.yaml · projectOrder: slugs de src/content/projects/<idioma>/
+
+- id: general
+  order: 0
+  slug: { es: '', en: '' }
+  label: { es: General, en: Overview }
+  title:
+    es: Infraestructura IT · Monitoreo · Automatización
+    en: IT Infrastructure · Monitoring · Automation
+  tagline:
+    es: Mantengo redes productivas observables y automatizo lo repetitivo, para detectar los incidentes antes de que alguien los note.
+    en: I keep production networks observable and automate the repetitive work, so incidents are caught before anyone notices them.
+  summary:
+    es: >-
+      Estudiante de 5º año de Ingeniería en Sistemas de Información (UTN FRBA) con experiencia en infraestructura IT
+      productiva. En Celsur Logística trabajo en el monitoreo y la observabilidad de la red con WhatsUp Gold, Grafana y
+      Power BI, administro equipamiento Cisco y SD-WAN Fortinet, y automatizo procesos operativos con Python y
+      PowerShell. Me interesa construir infraestructura escalable, segura y confiable, trabajando junto a equipos
+      técnicos y de negocio.
+    en: >-
+      Fifth-year Information Systems Engineering student (UTN FRBA) with hands-on experience in production IT
+      infrastructure. At Celsur Logística I work on network monitoring and observability with WhatsUp Gold, Grafana and
+      Power BI, manage Cisco equipment and Fortinet SD-WAN, and automate operational processes with Python and
+      PowerShell. I enjoy building scalable, secure and reliable infrastructure alongside technical and business teams.
+  categoryOrder: [redes, monitoreo, automatizacion, seguridad, devops, desarrollo]
+  projectOrder: [serverguard, homelab, heladerar, web-cv]
+
+- id: redes
+  order: 1
+  slug: { es: redes, en: networking }
+  label: { es: Redes, en: Networking }
+  title:
+    es: Infraestructura de Red · Ingeniero de Redes Jr
+    en: Network Infrastructure · Junior Network Engineer
+  tagline:
+    es: Administro redes LAN/WAN y SD-WAN en producción y las monitoreo de punta a punta.
+    en: I manage production LAN/WAN and SD-WAN networks and monitor them end to end.
+  summary:
+    es: >-
+      Estudiante avanzado de Ingeniería en Sistemas de Información (UTN FRBA), con experiencia en infraestructura IT,
+      monitoreo y automatización de redes. Interesado en tecnologías de servidores, virtualización, cloud y análisis de
+      datos. Busco desarrollarme en entornos de soporte e infraestructura, aportando una mirada orientada a la mejora
+      continua y la automatización.
+    en: >-
+      Advanced Information Systems Engineering student (UTN FRBA) with experience in IT infrastructure, network
+      monitoring and automation. Interested in server technologies, virtualization, cloud and data analysis. I'm looking
+      to grow in support and infrastructure teams, bringing a continuous-improvement and automation mindset.
+  categoryOrder: [redes, monitoreo, automatizacion, devops, seguridad, desarrollo]
+  projectOrder: [homelab, serverguard, heladerar, web-cv]
+
+- id: seguridad
+  order: 2
+  slug: { es: seguridad, en: security }
+  label: { es: Seguridad, en: Security }
+  title:
+    es: Infraestructura & Automatización · Python · Seguridad de accesos
+    en: Infrastructure & Automation · Python · Access Security
+  tagline:
+    es: Desarrollo herramientas en Python que detectan accesos no autorizados y automatizan la respuesta ante incidentes.
+    en: I build Python tools that detect unauthorized access and automate incident response.
+  summary:
+    es: >-
+      Estudiante de 5º año de Ingeniería en Sistemas de Información (UTN FRBA) con experiencia en infraestructura IT
+      productiva, desarrollo de automatizaciones e integraciones en Python, y monitoreo y observabilidad de servicios
+      críticos. Desarrollé ServerGuard, una herramienta en Python que detecta en tiempo real accesos no autorizados a
+      servidores, y construí sistemas web de extremo a extremo con backend, APIs REST e integraciones externas. Me
+      interesan la gestión de identidades y accesos (IAM) y la seguridad aplicada al desarrollo de productos: busco
+      diseñar soluciones escalables, seguras y confiables, trabajando junto a equipos técnicos y de negocio.
+    en: >-
+      Fifth-year Information Systems Engineering student (UTN FRBA) with experience in production IT infrastructure,
+      Python automation and integrations, and monitoring and observability of critical services. I built ServerGuard, a
+      Python tool that detects unauthorized server access in real time, and I have built end-to-end web systems with
+      backends, REST APIs and external integrations. I'm interested in identity and access management (IAM) and security
+      applied to product development: I aim to design scalable, secure and reliable solutions, working alongside
+      technical and business teams.
+  categoryOrder: [seguridad, automatizacion, desarrollo, monitoreo, devops, redes]
+  projectOrder: [serverguard, heladerar, homelab, web-cv]
+
+- id: devops
+  order: 3
+  slug: { es: devops, en: devops }
+  label: { es: DevOps, en: DevOps }
+  title:
+    es: Cloud & DevOps · Observabilidad · Infraestructura como código
+    en: Cloud & DevOps · Observability · Infrastructure as Code
+  tagline:
+    es: 'Llevo prácticas de operación a todo lo que construyo: código versionado, pipelines automáticos y métricas desde el día uno.'
+    en: 'I bring operations practices to everything I build: versioned code, automated pipelines and metrics from day one.'
+  summary:
+    es: >-
+      Estudiante de 5º año de Ingeniería en Sistemas de Información (UTN FRBA) con experiencia en monitoreo y
+      observabilidad de infraestructura productiva (WhatsUp Gold, Grafana, Power BI) y automatización con Python y
+      PowerShell. Estoy construyendo un home lab con infraestructura como código (Terraform y Ansible) y métricas y
+      alertas con Prometheus y Grafana, y opero este sitio con CI/CD en GitHub Actions y Vercel. Tengo conocimientos de
+      Linux, Docker, Kubernetes, Jenkins y AWS.
+    en: >-
+      Fifth-year Information Systems Engineering student (UTN FRBA) with experience in monitoring and observability of
+      production infrastructure (WhatsUp Gold, Grafana, Power BI) and automation with Python and PowerShell. I'm building
+      a home lab with infrastructure as code (Terraform and Ansible) plus metrics and alerting with Prometheus and
+      Grafana, and I run this website with CI/CD on GitHub Actions and Vercel. I'm familiar with Linux, Docker,
+      Kubernetes, Jenkins and AWS.
+  categoryOrder: [devops, monitoreo, automatizacion, redes, desarrollo, seguridad]
+  projectOrder: [homelab, web-cv, serverguard, heladerar]

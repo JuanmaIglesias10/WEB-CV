@@ -1,0 +1,372 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../ui/Icon.astro';
+import { buildInfo } from '../../lib/build-info';
+import { formatDateTime } from '../../lib/dates';
+import { profile } from '../../data/profile';
+import lighthouse from '../../data/lighthouse.json';
+import { useTranslations, type Locale, type UiKey } from '../../i18n/ui';
+import { statusPath } from '../../i18n/routes';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const alternates = { es: statusPath('es'), en: statusPath('en') };
+const actionsUrl = `${profile.repo.url}/actions/workflows/ci.yml`;
+const uptimeKey = import.meta.env.PUBLIC_UPTIMEROBOT_KEY ?? '';
+
+type Scores = Record<'performance' | 'accessibility' | 'best-practices' | 'seo', number>;
+const scores = lighthouse.scores as Scores | null;
+const categories = ['performance', 'accessibility', 'best-practices', 'seo'] as const;
+const scoreColor = (s: number) => (s >= 90 ? 'var(--ok)' : s >= 50 ? 'var(--warn)' : 'var(--crit)');
+
+const buildRows = [
+  {
+    key: t('status.commit'),
+    value: buildInfo.shortSha,
+    href: buildInfo.sha === 'local' ? undefined : `${profile.repo.url}/commit/${buildInfo.sha}`,
+  },
+  { key: t('status.branch'), value: buildInfo.branch || '—' },
+  { key: t('status.env'), value: buildInfo.environment },
+  { key: t('status.builtAt'), value: formatDateTime(buildInfo.builtAt, locale) },
+];
+---
+
+<BaseLayout
+  locale={locale}
+  title={`${t('status.title')} — ${profile.name}`}
+  description={t('status.description')}
+  alternates={alternates}
+>
+  <div class="relative isolate border-b border-line">
+    <div class="noc-grid absolute inset-0 -z-10" aria-hidden="true"></div>
+    <div class="mx-auto max-w-6xl px-4 pt-12 pb-10 sm:px-6 sm:pt-16">
+      <p class="label-mono">
+        <span class="text-accent">jmi@noc:~$</span> systemctl status web-cv
+      </p>
+      <h1 class="mt-4 flex items-center gap-3 text-3xl font-extrabold tracking-tight sm:text-5xl">
+        <span class="status-dot size-3! text-ok" data-pulse aria-hidden="true"></span>
+        {t('status.title')}
+      </h1>
+      <p class="mt-4 max-w-3xl text-lg text-pretty text-muted">{t('status.description')}</p>
+    </div>
+  </div>
+
+  <div class="mx-auto grid max-w-6xl gap-5 px-4 py-10 sm:px-6 lg:grid-cols-2">
+    <!-- Build -->
+    <section class="panel p-5 sm:p-6" aria-labelledby="st-build">
+      <h2 id="st-build" class="label-mono flex items-center gap-2">
+        <span class="status-dot text-ok" aria-hidden="true"></span>
+        {t('status.build')}
+      </h2>
+      {buildInfo.message && <p class="mt-4 font-mono text-sm text-fg">“{buildInfo.message}”</p>}
+      <dl class="mt-4 divide-y divide-line font-mono text-sm">
+        {buildRows.map((row) => (
+          <div class="flex justify-between gap-4 py-2.5">
+            <dt class="text-subtle">{row.key}</dt>
+            <dd>
+              {row.href ? (
+                <a href={row.href} class="text-accent hover:underline">
+                  {row.value}
+                </a>
+              ) : (
+                row.value
+              )}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <!-- Pipeline -->
+    <section class="panel p-5 sm:p-6" aria-labelledby="st-pipeline" data-pipeline>
+      <div class="flex items-center justify-between gap-4">
+        <h2 id="st-pipeline" class="label-mono flex items-center gap-2">
+          <span class="status-dot text-subtle" data-pipeline-dot aria-hidden="true"></span>
+          {t('status.pipeline')}
+        </h2>
+        <a href={actionsUrl} class="inline-flex items-center gap-1 text-xs text-subtle hover:text-accent">
+          {t('status.viewRuns')}
+          <Icon name="external" class="size-3" />
+        </a>
+      </div>
+      <div
+        class="mt-4"
+        data-pipeline-body
+        data-repo={`${profile.repo.owner}/${profile.repo.name}`}
+        data-locale={locale}
+        data-msg-error={t('status.pipelineError')}
+        data-msg-empty={t('status.pipelineEmpty')}
+        data-msg-ok={t('status.ok')}
+        data-msg-failed={t('status.failed')}
+        data-msg-running={t('status.running')}
+        data-msg-runs={t('status.lastRuns')}
+      >
+        <p class="font-mono text-sm text-subtle">{t('status.pipelineLoading')}</p>
+      </div>
+    </section>
+
+    <!-- Lighthouse -->
+    <section class="panel p-5 sm:p-6" aria-labelledby="st-lh">
+      <h2 id="st-lh" class="label-mono flex items-center gap-2">
+        <span class:list={['status-dot', scores ? 'text-ok' : 'text-subtle']} aria-hidden="true"></span>
+        {t('status.lighthouse')}
+      </h2>
+      {scores ? (
+        <ul class="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {categories.map((cat) => {
+            const score = Math.round(scores[cat]);
+            return (
+              <li class="flex flex-col items-center gap-2 text-center">
+                <svg
+                  viewBox="0 0 64 64"
+                  class="size-16"
+                  role="img"
+                  aria-label={`${t(`lh.${cat}` as UiKey)}: ${score}`}
+                >
+                  <circle cx="32" cy="32" r="27" fill="none" stroke="var(--line)" stroke-width="5" />
+                  <circle
+                    cx="32"
+                    cy="32"
+                    r="27"
+                    fill="none"
+                    stroke={scoreColor(score)}
+                    stroke-width="5"
+                    stroke-linecap="round"
+                    stroke-dasharray={`${(score / 100) * 169.6} 169.6`}
+                    transform="rotate(-90 32 32)"
+                  />
+                  <text x="32" y="37" text-anchor="middle" font-size="16" font-weight="700" fill="var(--fg)">
+                    {score}
+                  </text>
+                </svg>
+                <span class="text-xs text-muted">{t(`lh.${cat}` as UiKey)}</span>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p class="mt-4 font-mono text-sm text-subtle">{t('status.lighthousePending')}</p>
+      )}
+      <p class="mt-5 text-sm text-subtle">
+        {t('status.lighthouseHint')}
+        {lighthouse.measuredAt && (
+          <>
+            {' '}
+            {t('status.measuredAt')}: {formatDateTime(lighthouse.measuredAt, locale)}.
+          </>
+        )}
+      </p>
+    </section>
+
+    <!-- Uptime -->
+    <section class="panel p-5 sm:p-6" aria-labelledby="st-uptime" data-uptime data-key={uptimeKey}>
+      <h2 id="st-uptime" class="label-mono flex items-center gap-2">
+        <span class="status-dot text-subtle" data-uptime-dot aria-hidden="true"></span>
+        {t('status.uptime')}
+      </h2>
+      <dl class="mt-4 grid grid-cols-3 gap-3 font-mono" data-uptime-values hidden>
+        <div>
+          <dt class="text-xs text-subtle">{t('status.uptime7')}</dt>
+          <dd class="mt-1 text-xl font-semibold" data-uptime-7>
+            —
+          </dd>
+        </div>
+        <div>
+          <dt class="text-xs text-subtle">{t('status.uptime30')}</dt>
+          <dd class="mt-1 text-xl font-semibold" data-uptime-30>
+            —
+          </dd>
+        </div>
+        <div>
+          <dt class="text-xs text-subtle">{t('status.responseTime')}</dt>
+          <dd class="mt-1 text-xl font-semibold" data-uptime-rt>
+            —
+          </dd>
+        </div>
+      </dl>
+      <p class="mt-4 font-mono text-sm text-subtle" data-uptime-pending>
+        {t('status.uptimePending')}
+      </p>
+      <p class="mt-4 text-sm text-subtle">{t('status.uptimeHint')}</p>
+    </section>
+
+    <!-- Tu conexión -->
+    <section class="panel p-5 sm:p-6 lg:col-span-2" aria-labelledby="st-conn">
+      <h2 id="st-conn" class="label-mono flex items-center gap-2">
+        <span class="status-dot text-accent" aria-hidden="true"></span>
+        {t('status.connection')}
+      </h2>
+      <dl class="mt-4 grid gap-4 font-mono sm:grid-cols-3">
+        <div>
+          <dt class="text-xs text-subtle">{t('telemetry.rtt')} (p50)</dt>
+          <dd
+            class="mt-1 text-2xl font-semibold"
+            data-telemetry="rtt"
+            data-unavailable={t('telemetry.unavailable')}
+          >
+            {t('telemetry.measuring')}
+          </dd>
+          <dd class="mt-1 text-xs text-subtle" data-telemetry="samples"></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-subtle">{t('telemetry.edge')}</dt>
+          <dd
+            class="mt-1 text-2xl font-semibold"
+            data-telemetry="region"
+            data-local={t('telemetry.local')}
+            data-unavailable={t('telemetry.unavailable')}
+          >
+            {t('telemetry.measuring')}
+          </dd>
+          <dd class="mt-1 text-xs text-subtle" data-telemetry="city"></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-subtle">{t('telemetry.deploy')}</dt>
+          <dd class="mt-1 text-2xl font-semibold" data-telemetry="deploy" data-built-at={buildInfo.builtAt}>
+            {buildInfo.builtAt.slice(0, 10)}
+          </dd>
+          <dd class="mt-1 text-xs text-subtle">
+            {buildInfo.shortSha} · {buildInfo.environment}
+          </dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import { hydrateTelemetry, relativeTime } from '../../scripts/telemetry';
+
+  interface WorkflowRun {
+    id: number;
+    status: string;
+    conclusion: string | null;
+    html_url: string;
+    head_sha: string;
+    display_title: string;
+    created_at: string;
+    run_started_at?: string;
+    updated_at: string;
+  }
+
+  function el<K extends keyof HTMLElementTagNameMap>(
+    tag: K,
+    className = '',
+    text = '',
+  ): HTMLElementTagNameMap[K] {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text) node.textContent = text;
+    return node;
+  }
+
+  async function loadPipeline() {
+    const body = document.querySelector<HTMLElement>('[data-pipeline-body]');
+    const dot = document.querySelector<HTMLElement>('[data-pipeline-dot]');
+    if (!body || body.dataset.loaded) return;
+    body.dataset.loaded = 'true';
+    const d = body.dataset;
+    try {
+      const res = await fetch(
+        `https://api.github.com/repos/${d.repo}/actions/workflows/ci.yml/runs?branch=main&per_page=8`,
+        { headers: { Accept: 'application/vnd.github+json' } },
+      );
+      if (!res.ok) throw new Error(String(res.status));
+      const { workflow_runs: runs } = (await res.json()) as { workflow_runs: WorkflowRun[] };
+      body.replaceChildren();
+      if (!runs.length) {
+        body.append(el('p', 'font-mono text-sm text-subtle', d.msgEmpty));
+        return;
+      }
+      const state = (r: WorkflowRun) =>
+        r.status !== 'completed' ? 'running' : r.conclusion === 'success' ? 'ok' : 'failed';
+      const color = { ok: 'var(--ok)', failed: 'var(--crit)', running: 'var(--warn)' } as const;
+      const label = { ok: d.msgOk, failed: d.msgFailed, running: d.msgRunning } as const;
+
+      const last = runs[0];
+      const lastState = state(last);
+      if (dot) dot.style.color = color[lastState];
+
+      const head = el('a', 'block rounded-lg border border-line bg-sunken p-3 hover:border-accent');
+      head.href = last.html_url;
+      const title = el('p', 'font-mono text-sm text-fg truncate', last.display_title);
+      const meta = el('p', 'mt-1 font-mono text-xs');
+      meta.style.color = color[lastState];
+      const duration =
+        lastState === 'running'
+          ? ''
+          : ` · ${Math.max(1, Math.round((new Date(last.updated_at).getTime() - new Date(last.run_started_at ?? last.created_at).getTime()) / 1000))}s`;
+      meta.textContent = `● ${label[lastState]} · ${last.head_sha.slice(0, 7)} · ${relativeTime(last.created_at, d.locale ?? 'es')}${duration}`;
+      head.append(title, meta);
+
+      const history = el('div', 'mt-4');
+      history.append(el('p', 'text-xs text-subtle', d.msgRuns));
+      const bars = el('div', 'mt-2 flex gap-1.5');
+      [...runs].reverse().forEach((r) => {
+        const s = state(r);
+        const bar = el('a', 'h-7 flex-1 rounded-sm transition-opacity hover:opacity-70');
+        bar.href = r.html_url;
+        bar.style.background = color[s];
+        bar.title = `${label[s]} · ${r.head_sha.slice(0, 7)} · ${r.display_title}`;
+        bar.setAttribute('aria-label', bar.title);
+        bars.append(bar);
+      });
+      history.append(bars);
+      body.append(head, history);
+    } catch {
+      body.replaceChildren(el('p', 'font-mono text-sm text-subtle', d.msgError));
+    }
+  }
+
+  async function loadUptime() {
+    const section = document.querySelector<HTMLElement>('[data-uptime]');
+    if (!section?.dataset.key || section.dataset.loaded) return;
+    section.dataset.loaded = 'true';
+    try {
+      const res = await fetch('https://api.uptimerobot.com/v2/getMonitors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          api_key: section.dataset.key,
+          format: 'json',
+          custom_uptime_ratios: '7-30',
+          response_times: '1',
+          response_times_limit: '24',
+        }),
+      });
+      const data = (await res.json()) as {
+        stat: string;
+        monitors?: { status: number; custom_uptime_ratio: string; average_response_time?: string }[];
+      };
+      const monitor = data.monitors?.[0];
+      if (data.stat !== 'ok' || !monitor) return;
+      const [u7, u30] = monitor.custom_uptime_ratio.split('-');
+      const set = (sel: string, value: string) => {
+        const node = section.querySelector(sel);
+        if (node) node.textContent = value;
+      };
+      set('[data-uptime-7]', `${Number(u7).toFixed(2)}%`);
+      set('[data-uptime-30]', `${Number(u30).toFixed(2)}%`);
+      set(
+        '[data-uptime-rt]',
+        monitor.average_response_time ? `${Math.round(Number(monitor.average_response_time))} ms` : '—',
+      );
+      section.querySelector('[data-uptime-values]')?.removeAttribute('hidden');
+      section.querySelector('[data-uptime-pending]')?.setAttribute('hidden', '');
+      const dot = section.querySelector<HTMLElement>('[data-uptime-dot]');
+      if (dot) dot.style.color = monitor.status === 2 ? 'var(--ok)' : 'var(--crit)';
+    } catch {
+      /* el panel queda en estado "pendiente" */
+    }
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    void hydrateTelemetry();
+    void loadPipeline();
+    void loadUptime();
+  });
+</script>

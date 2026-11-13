@@ -1,0 +1,106 @@
+# Skills por categoría (las mismas de los CVs). Una skill puede repetirse en varias categorías con el mismo id
+# (por ejemplo Python): en la topología se resaltan juntas.
+# `short` es la etiqueta corta para el mapa; `name` la completa para listas y PDF.
+
+- id: redes
+  label: { es: Redes, en: Networking }
+  short: { es: Redes, en: Networking }
+  items:
+    - id: cisco
+      name: 'Cisco (routers, switches, APs)'
+      short: Cisco
+    - id: lan-wan
+      name: LAN/WAN
+    - id: sdwan
+      name: Fortinet SD-WAN
+      short: SD-WAN
+
+- id: monitoreo
+  label: { es: Monitoreo & observabilidad, en: Monitoring & observability }
+  short: { es: Monitoreo, en: Monitoring }
+  items:
+    - id: whatsup-gold
+      name: WhatsUp Gold
+    - id: grafana
+      name: Grafana
+    - id: prometheus
+      name: Prometheus
+    - id: power-bi
+      name: Power BI
+    - id: alertas
+      name: { es: Alertas y gestión de incidentes, en: Alerting & incident management }
+      short: { es: Alertas e incidentes, en: Alerts & incidents }
+
+- id: seguridad
+  label: { es: Seguridad & accesos, en: Security & access }
+  short: { es: Seguridad, en: Security }
+  items:
+    - id: accesos
+      name: { es: Detección de accesos no autorizados, en: Unauthorized access detection }
+      short: { es: Detección de accesos, en: Access detection }
+    - id: logs-auth
+      name: { es: Análisis de logs de autenticación, en: Authentication log analysis }
+      short: { es: Logs de autenticación, en: Auth log analysis }
+    - id: whitelisting
+      name: Whitelisting
+    - id: fortinet
+      name: Fortinet
+
+- id: devops
+  label: { es: Cloud & DevOps, en: Cloud & DevOps }
+  short: { es: Cloud & DevOps, en: Cloud & DevOps }
+  items:
+    - id: linux
+      name: Linux
+    - id: docker
+      name: Docker
+    - id: kubernetes
+      name: Kubernetes
+    - id: jenkins
+      name: Jenkins
+    - id: aws
+      name: AWS
+    - id: ansible
+      name: Ansible
+    - id: terraform
+      name: Terraform
+    - id: servidores
+      name: { es: Servidores, en: Servers }
+    - id: virtualizacion
+      name: { es: Virtualización, en: Virtualization }
+
+- id: automatizacion
+  label: { es: Automatización, en: Automation }
+  short: { es: Automatización, en: Automation }
+  items:
+    - id: python
+      name: Python
+    - id: powershell
+      name: PowerShell
+    - id: power-automate
+      name: Power Automate
+    - id: scripting
+      name: Scripting
+    - id: cron
+      name: Cron
+
+- id: desarrollo
+  label: { es: Desarrollo backend & web, en: Backend & web development }
+  short: { es: Desarrollo, en: Development }
+  items:
+    - id: python
+      name: Python
+    - id: java
+      name: Java
+    - id: sql
+      name: SQL
+    - id: javascript
+      name: JavaScript
+    - id: rest
+      name: { es: APIs REST, en: REST APIs }
+    - id: hibernate
+      name: Hibernate
+    - id: git
+      name: Git/GitHub
+    - id: c-cpp
+      name: C/C++

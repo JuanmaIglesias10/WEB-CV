@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../sections/Hero.astro';
+import About from '../sections/About.astro';
+import Experience from '../sections/Experience.astro';
+import Projects from '../sections/Projects.astro';
+import Skills from '../sections/Skills.astro';
+import Education from '../sections/Education.astro';
+import Contact from '../sections/Contact.astro';
+import { getCv, getFocuses } from '../../lib/cv';
+import { profile } from '../../data/profile';
+import type { Locale } from '../../i18n/ui';
+import { homePath } from '../../i18n/routes';
+
+interface Props {
+  locale: Locale;
+  focusId: string;
+}
+
+const { locale, focusId } = Astro.props;
+const cv = await getCv(locale, focusId);
+const focusEntry = (await getFocuses()).find((f) => f.id === focusId)!;
+const alternates = {
+  es: homePath('es', focusEntry.data.slug.es),
+  en: homePath('en', focusEntry.data.slug.en),
+};
+const title = `${profile.name} — ${cv.focus.title}`;
+---
+
+<BaseLayout
+  locale={locale}
+  title={title}
+  description={cv.focus.tagline}
+  alternates={alternates}
+  focusId={focusId}
+  ogType="profile"
+>
+  <Hero cv={cv} />
+  <About cv={cv} />
+  <Experience cv={cv} />
+  <Projects cv={cv} />
+  <Skills cv={cv} />
+  <Education cv={cv} />
+  <Contact cv={cv} />
+</BaseLayout>

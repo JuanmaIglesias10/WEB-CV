@@ -1,0 +1,133 @@
+---
+import FocusSelector from '../FocusSelector.astro';
+import Icon from '../ui/Icon.astro';
+import type { Cv } from '../../lib/cv';
+import { buildInfo } from '../../lib/build-info';
+import { profile } from '../../data/profile';
+import { useTranslations } from '../../i18n/ui';
+import { cvPdfPath, statusPath } from '../../i18n/routes';
+
+interface Props {
+  cv: Cv;
+}
+
+const { cv } = Astro.props;
+const { locale, focus } = cv;
+const t = useTranslations(locale);
+const downloadName = `CV-Juan-Manuel-Iglesias-${focus.label.replace(/\s+/g, '-')}-${locale.toUpperCase()}.pdf`;
+---
+
+<section class="relative isolate overflow-hidden border-b border-line" aria-labelledby="hero-title">
+  <div class="noc-grid absolute inset-0 -z-10" aria-hidden="true"></div>
+  <div
+    class="absolute -top-40 left-1/2 -z-10 h-[28rem] w-[56rem] -translate-x-1/2 rounded-full blur-3xl"
+    style="background: radial-gradient(closest-side, var(--glow), transparent);"
+    aria-hidden="true"
+  ></div>
+
+  <div class="mx-auto max-w-6xl px-4 pt-14 pb-16 sm:px-6 sm:pt-20 sm:pb-20">
+    <a
+      href={statusPath(locale)}
+      class="inline-flex items-center gap-2 rounded-full border border-ok/30 bg-ok-soft px-3 py-1 font-mono text-xs text-ok transition-colors hover:border-ok"
+    >
+      <span class="status-dot" data-pulse aria-hidden="true"></span>
+      {t('hero.status')}
+      <Icon name="arrow-right" class="size-3.5" />
+    </a>
+
+    <h1 id="hero-title" class="mt-6 text-4xl font-extrabold tracking-tight text-balance sm:text-6xl">
+      {profile.name}
+    </h1>
+    <p
+      class="mt-4 font-mono text-sm font-medium tracking-wide text-accent uppercase sm:text-base"
+      transition:name="focus-title"
+    >
+      {focus.title}
+    </p>
+    <p class="mt-5 max-w-2xl text-lg text-pretty text-muted sm:text-xl" transition:name="focus-tagline">
+      {focus.tagline}
+    </p>
+
+    <div class="mt-8">
+      <FocusSelector locale={locale} focuses={cv.focuses} current={focus.id} />
+    </div>
+
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href={cvPdfPath(locale, focus.id)} download={downloadName} class="btn btn-primary">
+        <Icon name="download" />
+        {t('hero.downloadCv')}
+        <span class="rounded bg-accent-fg/15 px-1.5 py-0.5 font-mono text-[11px]">
+          {focus.label} · {t('hero.pdf')}
+        </span>
+      </a>
+      <a href={profile.links.github} class="btn btn-ghost" rel="me noopener">
+        <Icon name="github" />
+        GitHub
+      </a>
+      <a href={profile.links.linkedin} class="btn btn-ghost" rel="me noopener">
+        <Icon name="linkedin" />
+        LinkedIn
+      </a>
+    </div>
+
+    <dl class="mt-12 grid gap-3 sm:grid-cols-3">
+      <div class="panel p-4">
+        <dt class="label-mono flex items-center gap-2">
+          <span class="status-dot text-ok" aria-hidden="true"></span>
+          {t('telemetry.rtt')}
+        </dt>
+        <dd class="mt-2">
+          <span
+            class="font-mono text-2xl font-semibold tabular-nums"
+            data-telemetry="rtt"
+            data-unavailable={t('telemetry.unavailable')}
+          >
+            {t('telemetry.measuring')}
+          </span>
+          <span class="mt-1 block text-xs text-subtle">{t('telemetry.rttHint')}</span>
+        </dd>
+      </div>
+      <div class="panel p-4">
+        <dt class="label-mono flex items-center gap-2">
+          <span class="status-dot text-accent" aria-hidden="true"></span>
+          {t('telemetry.edge')}
+        </dt>
+        <dd class="mt-2">
+          <span
+            class="font-mono text-2xl font-semibold"
+            data-telemetry="region"
+            data-local={t('telemetry.local')}
+            data-unavailable={t('telemetry.unavailable')}
+          >
+            {t('telemetry.measuring')}
+          </span>
+          <span class="ml-1 text-sm text-muted" data-telemetry="city"></span>
+          <span class="mt-1 block text-xs text-subtle">{t('telemetry.edgeHint')}</span>
+        </dd>
+      </div>
+      <div class="panel p-4">
+        <dt class="label-mono flex items-center gap-2">
+          <span class="status-dot text-ok" aria-hidden="true"></span>
+          {t('telemetry.deploy')}
+        </dt>
+        <dd class="mt-2">
+          <span
+            class="font-mono text-2xl font-semibold"
+            data-telemetry="deploy"
+            data-built-at={buildInfo.builtAt}
+          >
+            <time datetime={buildInfo.builtAt}>{buildInfo.builtAt.slice(0, 10)}</time>
+          </span>
+          <a href={statusPath(locale)} class="mt-1 block font-mono text-xs text-subtle hover:text-accent">
+            commit {buildInfo.shortSha} · {buildInfo.environment}
+          </a>
+        </dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<script>
+  import { hydrateTelemetry } from '../../scripts/telemetry';
+  document.addEventListener('astro:page-load', () => void hydrateTelemetry());
+</script>

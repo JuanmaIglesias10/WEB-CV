@@ -1,0 +1,16 @@
+---
+import type { GetStaticPaths } from 'astro';
+import HomePage from '../components/pages/HomePage.astro';
+import { getFocuses } from '../lib/cv';
+
+export const getStaticPaths = (async () => {
+  const focuses = await getFocuses();
+  return focuses
+    .filter((f) => f.data.slug.es)
+    .map((f) => ({ params: { focus: f.data.slug.es }, props: { id: f.id } }));
+}) satisfies GetStaticPaths;
+
+const { id } = Astro.props;
+---
+
+<HomePage locale="es" focusId={id} />

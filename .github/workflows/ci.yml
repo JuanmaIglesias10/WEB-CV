@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Lint, tipos, build y Lighthouse
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Configurar Node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Lint (ESLint)
+        run: npm run lint
+
+      - name: Formato (Prettier)
+        run: npm run format:check
+
+      - name: Chequeo de tipos (astro check)
+        run: npm run check
+
+      - name: Build (incluye PDFs del CV e imágenes OG)
+        run: npm run build
+
+      - name: Lighthouse CI (umbral 95 en todas las categorías)
+        run: npx --yes @lhci/cli@0.16.1 autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Publicar PDFs del CV
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: cv-pdfs
+          path: dist/cv/*.pdf
+          if-no-files-found: ignore
+
+      - name: Publicar reporte de Lighthouse
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: lighthouse-report
+          path: .lighthouseci/
+          if-no-files-found: ignore

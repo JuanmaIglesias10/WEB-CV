@@ -1,0 +1,47 @@
+---
+import Section from '../ui/Section.astro';
+import type { Cv } from '../../lib/cv';
+import { useTranslations } from '../../i18n/ui';
+import { sectionIds } from '../../i18n/routes';
+
+interface Props {
+  cv: Cv;
+}
+
+const { cv } = Astro.props;
+const t = useTranslations(cv.locale);
+const current = cv.experience[0];
+const studies = cv.education[0];
+
+const rows = [
+  { key: t('about.role'), value: current ? `${current.role} @ ${current.company}` : '—' },
+  { key: t('about.studies'), value: studies ? `${studies.title} · ${studies.detail}` : '—' },
+  { key: t('about.languages'), value: cv.languages.map((l) => `${l.name} (${l.level})`).join(' · ') },
+  { key: t('about.location'), value: cv.location },
+  { key: t('about.focus'), value: cv.focus.label },
+];
+---
+
+<Section id={sectionIds.about} index="01" command="show version" title={t('about.title')}>
+  <div class="grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:gap-12">
+    <p class="text-lg leading-relaxed text-pretty text-muted" transition:name="focus-summary">
+      {cv.focus.summary}
+    </p>
+    <div class="panel overflow-hidden">
+      <div class="flex items-center gap-2 border-b border-line bg-sunken px-4 py-2.5">
+        <span class="size-2.5 rounded-full bg-crit/70" aria-hidden="true"></span>
+        <span class="size-2.5 rounded-full bg-warn/70" aria-hidden="true"></span>
+        <span class="size-2.5 rounded-full bg-ok/70" aria-hidden="true"></span>
+        <span class="ml-2 font-mono text-xs text-subtle">jmi@noc:~$ {t('about.card')}</span>
+      </div>
+      <dl class="divide-y divide-line font-mono text-sm">
+        {rows.map((row) => (
+          <div class="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-3">
+            <dt class="text-subtle">{row.key}</dt>
+            <dd class="text-fg">{row.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </div>
+</Section>

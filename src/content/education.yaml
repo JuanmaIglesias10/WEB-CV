@@ -1,0 +1,17 @@
+- id: utn
+  order: 0
+  institution: Universidad Tecnológica Nacional – FRBA
+  title: { es: Ingeniería en Sistemas de Información, en: Information Systems Engineering }
+  detail: { es: 5º año, en: 5th year }
+  start: 2021
+  end: null
+  progress: { current: 5, total: 5 }
+
+- id: infra-it
+  order: 1
+  institution: Universidad Tecnológica Nacional – FRBA
+  title: { es: Curso de Infraestructura IT, en: IT Infrastructure Course }
+  detail: { es: 96 horas, en: 96 hours }
+  start: 2023
+  end: 2023
+  credential: https://sceu-utnba.bitrix24.es/pub/document/62802/4d3f41989e356fbb97de07650fa6172a/

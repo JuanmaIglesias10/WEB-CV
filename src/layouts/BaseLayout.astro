@@ -1,0 +1,161 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import PaletteTrigger from '../components/PaletteTrigger.astro';
+import interWoff2 from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import { buildPaletteItems } from '../lib/palette';
+import { getCv } from '../lib/cv';
+import { profile } from '../data/profile';
+import { htmlLang, ogLocale, otherLocale, useTranslations, type Locale } from '../i18n/ui';
+import { ogImagePath } from '../i18n/routes';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description?: string;
+  /** Rutas equivalentes en cada idioma (para hreflang y el switch de idioma). */
+  alternates: Record<Locale, string>;
+  focusId?: string;
+  ogType?: 'website' | 'article' | 'profile';
+  noindex?: boolean;
+}
+
+const {
+  locale,
+  title,
+  description,
+  alternates,
+  focusId = 'general',
+  ogType = 'website',
+  noindex = false,
+} = Astro.props;
+const t = useTranslations(locale);
+const metaDescription = description ?? t('meta.description');
+const site = Astro.site ?? new URL(Astro.url.origin);
+const canonical = new URL(alternates[locale], site).href;
+const ogImage = new URL(ogImagePath(locale, focusId), site).href;
+
+const cv = await getCv(locale, focusId);
+const paletteItems = buildPaletteItems(cv, alternates);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.name,
+  url: new URL(locale === 'es' ? '/' : '/en/', site).href,
+  jobTitle: cv.focus.title,
+  email: `mailto:${profile.email}`,
+  sameAs: [profile.links.github, profile.links.linkedin],
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'Universidad Tecnológica Nacional – FRBA' },
+  worksFor: { '@type': 'Organization', name: 'Celsur Logística' },
+  knowsLanguage: ['es', 'en'],
+};
+---
+
+<!doctype html>
+<html lang={htmlLang[locale]} data-focus={focusId}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={metaDescription} />
+    <meta name="author" content={profile.name} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="es" href={new URL(alternates.es, site).href} />
+    <link rel="alternate" hreflang="en" href={new URL(alternates.en, site).href} />
+    <link rel="alternate" hreflang="x-default" href={new URL(alternates.es, site).href} />
+    <link rel="preload" href={interWoff2} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content="#f4f6f9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#070b12" media="(prefers-color-scheme: dark)" />
+    <meta name="generator" content={Astro.generator} />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={profile.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${profile.name} — ${cv.focus.title}`} />
+    <meta property="og:locale" content={ogLocale[locale]} />
+    <meta property="og:locale:alternate" content={ogLocale[otherLocale(locale)]} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={metaDescription} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+    <script is:inline>
+      (() => {
+        if (window.__theme) return;
+        const KEY = 'theme';
+        const media = matchMedia('(prefers-color-scheme: dark)');
+        const stored = () => {
+          try {
+            return localStorage.getItem(KEY);
+          } catch {
+            return null;
+          }
+        };
+        const current = () => stored() ?? (media.matches ? 'dark' : 'light');
+        const apply = (theme, doc = document) => {
+          doc.documentElement.classList.toggle('dark', theme === 'dark');
+          doc.documentElement.dataset.theme = theme;
+        };
+        window.__theme = {
+          get: current,
+          set(theme) {
+            try {
+              localStorage.setItem(KEY, theme);
+            } catch {
+              /* almacenamiento no disponible: el tema vale solo para esta visita */
+            }
+            apply(theme);
+            document.dispatchEvent(new CustomEvent('themechange', { detail: theme }));
+          },
+          toggle() {
+            this.set(current() === 'dark' ? 'light' : 'dark');
+          },
+        };
+        apply(current());
+        document.addEventListener('astro:before-swap', (e) => apply(current(), e.newDocument));
+        media.addEventListener('change', () => {
+          if (!stored()) apply(current());
+        });
+      })();
+    </script>
+
+    <ClientRouter />
+  </head>
+  <body class="min-h-dvh overflow-x-hidden">
+    <a
+      href="#main"
+      class="sr-only z-50 rounded-md bg-accent px-4 py-2 font-semibold text-accent-fg focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+    >
+      {t('skip.toContent')}
+    </a>
+    <Header locale={locale} alternates={alternates}>
+      <PaletteTrigger
+        slot="palette"
+        items={paletteItems}
+        labels={{
+          open: t('palette.open'),
+          title: t('palette.title'),
+          placeholder: t('palette.placeholder'),
+          empty: t('palette.empty'),
+          hint: t('palette.hint'),
+        }}
+      />
+    </Header>
+    <main id="main" tabindex="-1" class="outline-none">
+      <slot />
+    </main>
+    <Footer locale={locale} />
+  </body>
+</html>

@@ -1,0 +1,72 @@
+---
+import Section from '../ui/Section.astro';
+import Tag from '../ui/Tag.astro';
+import type { Cv } from '../../lib/cv';
+import { formatYearMonth, monthsSince } from '../../lib/dates';
+import { useTranslations } from '../../i18n/ui';
+import { sectionIds } from '../../i18n/routes';
+
+interface Props {
+  cv: Cv;
+}
+
+const { cv } = Astro.props;
+const { locale } = cv;
+const t = useTranslations(locale);
+---
+
+<Section id={sectionIds.experience} index="02" command="show history" title={t('experience.title')}>
+  <ol class="space-y-6">
+    {cv.experience.map((job) => {
+      const months = monthsSince(job.start);
+      const active = job.end === null;
+      return (
+        <li class="panel relative overflow-hidden p-5 sm:p-7">
+          <div
+            class="absolute inset-y-0 left-0 w-1"
+            style="background: linear-gradient(var(--ok), transparent);"
+            aria-hidden="true"
+          />
+          <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+            <div>
+              <h3 class="text-xl font-bold tracking-tight">
+                {job.role} <span class="font-medium text-muted">— {job.company}</span>
+              </h3>
+              <p class="mt-1 font-mono text-sm text-subtle">
+                {formatYearMonth(job.start, locale)} –{' '}
+                {job.end ? formatYearMonth(job.end, locale) : t('experience.present')}
+              </p>
+            </div>
+            {active && (
+              <p class="inline-flex items-center gap-2 rounded-full border border-ok/30 bg-ok-soft px-3 py-1 font-mono text-xs text-ok">
+                <span class="status-dot" data-pulse aria-hidden="true" />
+                {t('experience.inService')} ·{' '}
+                {months === 1 ? t('experience.month') : t('experience.months', { n: months })}
+              </p>
+            )}
+          </div>
+          <ul class="mt-5 space-y-3">
+            {job.highlights.map((h) => (
+              <li class="flex gap-3 text-pretty text-muted">
+                <span
+                  class:list={[
+                    'mt-2.5 size-1.5 shrink-0 rounded-full',
+                    h.relevant ? 'bg-accent' : 'bg-line-strong',
+                  ]}
+                  aria-hidden="true"
+                />
+                <span>{h.text}</span>
+              </li>
+            ))}
+          </ul>
+          <div class="mt-6 flex flex-wrap items-center gap-2">
+            <span class="label-mono mr-1">{t('experience.stack')}</span>
+            {job.skills.map((id) => (
+              <Tag>{cv.skillNames[id] ?? id}</Tag>
+            ))}
+          </div>
+        </li>
+      );
+    })}
+  </ol>
+</Section>

@@ -1,0 +1,111 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Tag from '../ui/Tag.astro';
+import Icon from '../ui/Icon.astro';
+import StatusBadge from '../ui/StatusBadge.astro';
+import { getProjects, projectSlug, type ProjectEntry } from '../../lib/cv';
+import { profile } from '../../data/profile';
+import { otherLocale, useTranslations, type Locale } from '../../i18n/ui';
+import { homePath, projectPath, sectionIds } from '../../i18n/routes';
+
+interface Props {
+  locale: Locale;
+  entry: ProjectEntry;
+}
+
+const { locale, entry } = Astro.props;
+const t = useTranslations(locale);
+const slug = projectSlug(entry);
+const p = entry.data;
+const { Content } = await render(entry);
+
+const other = otherLocale(locale);
+const hasTranslation = (await getProjects(other)).some((e) => projectSlug(e) === slug);
+const alternates = {
+  [locale]: projectPath(locale, slug),
+  [other]: hasTranslation ? projectPath(other, slug) : homePath(other),
+} as Record<Locale, string>;
+---
+
+<BaseLayout
+  locale={locale}
+  title={`${p.title} — ${profile.name}`}
+  description={p.summary}
+  alternates={alternates}
+  ogType="article"
+>
+  <article class="mx-auto max-w-3xl px-4 pt-10 pb-20 sm:px-6 sm:pt-14">
+    <a
+      href={`${homePath(locale)}#${sectionIds.projects}`}
+      class="inline-flex items-center gap-1.5 font-mono text-sm text-subtle hover:text-accent"
+    >
+      <Icon name="arrow-left" />
+      {t('projects.back')}
+    </a>
+
+    <header class="mt-8 border-b border-line pb-8">
+      <div class="flex flex-wrap items-center gap-3">
+        <p class="label-mono">{p.kind}</p>
+        <StatusBadge status={p.status} locale={locale} />
+      </div>
+      <h1 class="mt-4 text-3xl font-extrabold tracking-tight text-balance sm:text-5xl">{p.title}</h1>
+      <p class="mt-4 text-lg text-pretty text-muted">{p.summary}</p>
+
+      <dl class="mt-8 grid gap-4 font-mono text-sm sm:grid-cols-3">
+        <div class="panel px-4 py-3">
+          <dt class="label-mono">{t('projects.period')}</dt>
+          <dd class="mt-1">{p.period}</dd>
+        </div>
+        <div class="panel px-4 py-3">
+          <dt class="label-mono">{t('projects.statusLabel')}</dt>
+          <dd class="mt-1">{t(`projects.status.${p.status}`)}</dd>
+        </div>
+        {p.repo && (
+          <div class="panel px-4 py-3">
+            <dt class="label-mono">{t('projects.repo')}</dt>
+            <dd class="mt-1">
+              <a href={p.repo} class="inline-flex items-center gap-1.5 text-accent hover:underline">
+                <Icon name="github" />
+                GitHub
+              </a>
+            </dd>
+          </div>
+        )}
+      </dl>
+    </header>
+
+    {p.highlights.length > 0 && (
+      <section class="panel mt-10 p-5 sm:p-6" aria-labelledby="highlights-title">
+        <h2 id="highlights-title" class="label-mono">
+          {t('projects.highlights')}
+        </h2>
+        <ul class="mt-4 space-y-3">
+          {p.highlights.map((h) => (
+            <li class="flex gap-3 text-pretty text-muted">
+              <span class="mt-2.5 size-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+              <span>{h}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <div class="prose-noc mt-10">
+      <Content />
+    </div>
+
+    <section class="mt-12 border-t border-line pt-8" aria-labelledby="stack-title">
+      <h2 id="stack-title" class="label-mono">
+        {t('projects.stack')}
+      </h2>
+      <ul class="mt-4 flex flex-wrap gap-2">
+        {p.stack.map((s) => (
+          <li>
+            <Tag>{s}</Tag>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </article>
+</BaseLayout>

@@ -1,0 +1,106 @@
+---
+import Section from '../ui/Section.astro';
+import Icon from '../ui/Icon.astro';
+import type { Cv } from '../../lib/cv';
+import { profile } from '../../data/profile';
+import { useTranslations } from '../../i18n/ui';
+import { sectionIds } from '../../i18n/routes';
+
+interface Props {
+  cv: Cv;
+}
+
+const { cv } = Astro.props;
+const t = useTranslations(cv.locale);
+const mailto = `mailto:${profile.email}?subject=${encodeURIComponent(t('contact.subject'))}`;
+---
+
+<Section id={sectionIds.contact} index="06" command="open ticket" title={t('contact.title')}>
+  <div class="panel relative overflow-hidden">
+    <div class="noc-grid absolute inset-0 opacity-60" aria-hidden="true"></div>
+    <div class="relative grid gap-8 p-6 sm:p-10 lg:grid-cols-[1.3fr_1fr] lg:items-center">
+      <div>
+        <p class="label-mono">{t('contact.ticket')}</p>
+        <h3 class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">{t('contact.heading')}</h3>
+        <p class="mt-4 max-w-xl text-lg text-pretty text-muted">{t('contact.text')}</p>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a href={mailto} class="btn btn-primary">
+            <Icon name="mail" />
+            {t('contact.write')}
+          </a>
+          <button
+            type="button"
+            class="btn btn-ghost"
+            data-copy={profile.email}
+            data-copied={t('contact.copied')}
+            data-label={t('contact.copy')}
+          >
+            <Icon name="copy" />
+            <span data-copy-label>{t('contact.copy')}</span>
+          </button>
+        </div>
+        <p class="sr-only" role="status" aria-live="polite" data-copy-status></p>
+      </div>
+      <dl class="space-y-3 font-mono text-sm">
+        <div class="flex items-center justify-between gap-4 rounded-lg border border-line bg-elev/80 px-4 py-3">
+          <dt class="text-subtle">status</dt>
+          <dd class="inline-flex items-center gap-2 text-ok">
+            <span class="status-dot" data-pulse aria-hidden="true"></span>
+            {t('contact.statusLine')}
+          </dd>
+        </div>
+        <div class="flex items-center justify-between gap-4 rounded-lg border border-line bg-elev/80 px-4 py-3">
+          <dt class="text-subtle">email</dt>
+          <dd>
+            <a href={mailto} class="break-all hover:text-accent">
+              {profile.email}
+            </a>
+          </dd>
+        </div>
+        <div class="flex items-center justify-between gap-4 rounded-lg border border-line bg-elev/80 px-4 py-3">
+          <dt class="text-subtle">linkedin</dt>
+          <dd>
+            <a
+              href={profile.links.linkedin}
+              class="inline-flex items-center gap-1.5 hover:text-accent"
+              rel="me noopener"
+            >
+              in/jiglesiasarregui <Icon name="external" class="size-3.5" />
+            </a>
+          </dd>
+        </div>
+        <div class="flex items-center justify-between gap-4 rounded-lg border border-line bg-elev/80 px-4 py-3">
+          <dt class="text-subtle">github</dt>
+          <dd>
+            <a
+              href={profile.links.github}
+              class="inline-flex items-center gap-1.5 hover:text-accent"
+              rel="me noopener"
+            >
+              JuanmaIglesias10 <Icon name="external" class="size-3.5" />
+            </a>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</Section>
+
+<script>
+  document.addEventListener('click', async (e) => {
+    const btn = (e.target as Element | null)?.closest<HTMLButtonElement>('[data-copy]');
+    if (!btn) return;
+    const label = btn.querySelector('[data-copy-label]');
+    const status = document.querySelector('[data-copy-status]');
+    try {
+      await navigator.clipboard.writeText(btn.dataset.copy ?? '');
+      if (label) label.textContent = `✓ ${btn.dataset.copied}`;
+      if (status) status.textContent = btn.dataset.copied ?? '';
+      setTimeout(() => {
+        if (label) label.textContent = btn.dataset.label ?? '';
+      }, 2200);
+    } catch {
+      window.location.href = `mailto:${btn.dataset.copy}`;
+    }
+  });
+</script>

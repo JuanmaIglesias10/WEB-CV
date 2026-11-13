@@ -1,0 +1,45 @@
+---
+import { buildInfo } from '../lib/build-info';
+import { formatDate } from '../lib/dates';
+import { profile } from '../data/profile';
+import { useTranslations, type Locale } from '../i18n/ui';
+import { statusPath } from '../i18n/routes';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const year = new Date(buildInfo.builtAt).getFullYear();
+---
+
+<footer class="border-t border-line">
+  <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm text-subtle sm:px-6 md:flex-row md:items-center md:justify-between">
+    <p>
+      © {year} {profile.name} · {t('footer.madeWith')}
+    </p>
+    <p class="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs">
+      <a href={statusPath(locale)} class="inline-flex min-h-6 items-center gap-1.5 hover:text-fg">
+        <span class="status-dot text-ok" aria-hidden="true"></span>
+        {t('nav.status')}
+      </a>
+      <span aria-hidden="true">·</span>
+      <span>
+        {t('footer.build')}{' '}
+        <a
+          href={`${profile.repo.url}/commit/${buildInfo.sha}`}
+          class="inline-flex min-h-6 items-center hover:text-fg"
+        >
+          {buildInfo.shortSha}
+        </a>
+      </span>
+      <span aria-hidden="true">·</span>
+      <time datetime={buildInfo.builtAt}>{formatDate(buildInfo.builtAt, locale)}</time>
+      <span aria-hidden="true">·</span>
+      <a href={profile.repo.url} class="inline-flex min-h-6 items-center hover:text-fg">
+        {t('footer.source')}
+      </a>
+    </p>
+  </div>
+</footer>

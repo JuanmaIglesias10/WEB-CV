@@ -1,0 +1,30 @@
+---
+interface Props {
+  id: string;
+  index: string;
+  command: string;
+  title: string;
+  class?: string;
+}
+
+const { id, index, command, title, class: className } = Astro.props;
+---
+
+<section
+  id={id}
+  aria-labelledby={`${id}-title`}
+  class:list={['mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20', className]}
+>
+  <header class="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-line pb-4">
+    <div>
+      <p class="label-mono">
+        <span class="text-accent">{index}</span> · {command}
+      </p>
+      <h2 id={`${id}-title`} class="mt-2 text-2xl font-bold tracking-tight text-balance sm:text-3xl">
+        {title}
+      </h2>
+    </div>
+    <slot name="aside" />
+  </header>
+  <slot />
+</section>
